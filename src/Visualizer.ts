@@ -1,8 +1,25 @@
 export class Visualizer {
     private readonly canvas: HTMLCanvasElement;
     private readonly ctx: CanvasRenderingContext2D;
+    private cfg: VisualizerConfig;
 
-    constructor(canvas: HTMLCanvasElement) {
+    private players: Player[] = [];
+    private attacker: Player | null = null;
+    private defender: Player | null = null;
+    private attachedL: Player | null = null;
+    private attachedR: Player | null = null;
+
+    static readonly defaultConfig: VisualizerConfig = {
+        playerRadius: 15,
+        pointerLength: 30,
+        pointerWidth: 5,
+        pointerCap: "round",
+        styleAttacker: "red",
+        styleDefender: "green",
+        styleOther: "gray",
+    }
+
+    constructor(canvas: HTMLCanvasElement, cfg: Partial<VisualizerConfig> = {}) {
         // initialize canvas and context
         if (!canvas.getContext) {
             throw Error("canvas not supported");
@@ -13,8 +30,117 @@ export class Visualizer {
             throw Error("no drawing context");
         }
         this.ctx = ctx;
-        // hello world
-        ctx.arc(canvas.width/2, canvas.height/2, 10, 0, 2*Math.PI);
-        ctx.stroke();
+        // initialize config with defaults, then overwrite
+        this.cfg = {...Visualizer.defaultConfig, ...cfg};
+        // pose attacker and defender
+        const [centerX, centerY] = [canvas.width/2, canvas.height/2];
+        this.players.push({x: centerX - 2*this.cfg.playerRadius, y: centerY, t: 0});
+        this.players.push({x: centerX + 2*this.cfg.playerRadius, y: centerY, t: 0});
+        this.attacker = this.players[0];
+        this.defender = this.players[1];
+        // draw initial state
+        this.update()
+        // add listeners to canvas
+        this.addListeners()
     }
+
+    private addListeners() {
+        this.canvas.addEventListener("mousemove", (event: MouseEvent) => {
+            this.update(event);
+        });
+        this.canvas.addEventListener("mousedown", (event: MouseEvent) => {
+            if (event.button === 0) {
+                this.attachedL = this.target(event);
+            } else if (event.button === 2) {
+                this.attachedR = this.target(event);
+            }
+            this.update(event);
+        });
+        this.canvas.addEventListener("mouseup", (event: MouseEvent) => {
+            if (event.button === 0) {
+                this.attachedL = null;
+            } else if (event.button === 2) {
+                this.attachedR = null;
+            }
+            this.update(event);
+        });
+        this.canvas.addEventListener("mouseout", (event: MouseEvent) => {
+            this.attachedL = null;
+            this.attachedR = null;
+            this.update(event);
+        });
+        this.canvas.addEventListener("contextmenu", (event: MouseEvent) => {
+            event.preventDefault();
+        });
+    }
+
+    private target(mouseOffset: {offsetX: number; offsetY: number}): Player | null {
+        const rs = this.cfg.playerRadius**2;  // radius squared to compare against distance squared
+        const pairs: {p: Player; ds: number}[] = this.players.map(p => {
+            const ds = (mouseOffset.offsetX - p.x)**2 + (mouseOffset.offsetY - p.y);
+            return {p, ds};
+        }).filter(({p, ds}) => ds <= rs);
+        if (pairs.length === 0) {
+            return null;
+        } else {
+            pairs.sort((a, b) => a.ds - b.ds);
+            return pairs[0].p;
+        }
+    }
+
+    private update(mouseOffset: {offsetX: number; offsetY: number} | null = null) {
+        // update state
+        if (this.attachedL !== null && mouseOffset !== null) {
+            this.attachedL.x = mouseOffset.offsetX;
+            this.attachedL.y = mouseOffset.offsetY;
+        }
+        if (this.attachedR !== null && mouseOffset !== null) {
+            this.attachedR.t = Math.atan2(
+                mouseOffset.offsetY - this.attachedR.y, mouseOffset.offsetX - this.attachedR.x
+            );
+        }
+        // clear canvas
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        // draw state onto canvas
+        const target = mouseOffset !== null ? this.target(mouseOffset) : null;
+        for (const p of this.players) {
+            if (p === this.attacker) {
+                this.ctx.fillStyle = this.cfg.styleAttacker;
+                this.ctx.strokeStyle = this.cfg.styleAttacker;
+            } else if (p === this.defender) {
+                this.ctx.fillStyle = this.cfg.styleDefender;
+                this.ctx.strokeStyle = this.cfg.styleDefender;
+            } else {
+                this.ctx.fillStyle = this.cfg.styleOther;
+                this.ctx.strokeStyle = this.cfg.styleOther;
+            }
+            // draw circle
+            this.ctx.beginPath();
+            this.ctx.arc(p.x, p.y, this.cfg.playerRadius, 0, 2*Math.PI);
+            this.ctx.fill();
+            // draw line from center towards heading
+            this.ctx.lineWidth = this.cfg.pointerWidth;
+            this.ctx.lineCap = this.cfg.pointerCap;
+            this.ctx.beginPath();
+            this.ctx.moveTo(p.x, p.y);
+            this.ctx.lineTo(p.x + this.cfg.pointerLength*Math.cos(p.t), p.y + this.cfg.pointerLength*Math.sin(p.t));
+            this.ctx.stroke();
+        }
+    }
+}
+
+export type VisualizerConfig = {
+    playerRadius: number;
+    pointerLength: number;
+    pointerWidth: number;
+    pointerCap: "butt" | "round" | "square";
+    styleAttacker: string;
+    styleDefender: string;
+    styleOther: string;
+}
+
+type Player = {
+    x: number;
+    y: number;
+    t: number;
 }
