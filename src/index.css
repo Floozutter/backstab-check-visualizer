@@ -1,0 +1,16 @@
+body {
+    background-color: #222222;
+}
+
+#bscv-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#bscv-canvas {
+    display: block;
+    margin: 50px 50px 50px 50px;
+    background-color: #ffffff;
+}

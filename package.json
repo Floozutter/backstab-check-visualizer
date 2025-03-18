@@ -1,0 +1,28 @@
+{
+  "name": "backstab-check-visualizer",
+  "version": "0.0.1",
+  "description": "2D vizualizer for backstab checks",
+  "scripts": {
+    "build": "npx webpack",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Floozutter/backstab-check-visualizer.git"
+  },
+  "author": "Floozutter <me@floozutter.site> (http://www.floozutter.site/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Floozutter/backstab-check-visualizer/issues"
+  },
+  "homepage": "https://github.com/Floozutter/backstab-check-visualizer#readme",
+  "devDependencies": {
+    "css-loader": "^7.1.2",
+    "html-webpack-plugin": "^5.6.3",
+    "mini-css-extract-plugin": "^2.9.2",
+    "ts-loader": "^9.5.2",
+    "typescript": "^5.8.2",
+    "webpack": "^5.98.0",
+    "webpack-cli": "^6.0.1"
+  }
+}
