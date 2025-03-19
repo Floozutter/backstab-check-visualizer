@@ -34,10 +34,10 @@ export class Visualizer {
         this.cfg = {...Visualizer.defaultConfig, ...cfg};
         // pose attacker and defender
         const [centerX, centerY] = [canvas.width/2, canvas.height/2];
-        this.players.push({x: centerX - 2*this.cfg.playerRadius, y: centerY, t: 0});
         this.players.push({x: centerX + 2*this.cfg.playerRadius, y: centerY, t: 0});
-        this.attacker = this.players[0];
-        this.defender = this.players[1];
+        this.players.push({x: centerX - 2*this.cfg.playerRadius, y: centerY, t: 0});
+        this.attacker = this.players[1];
+        this.defender = this.players[0];
         // draw initial state
         this.update()
         // add listeners to canvas
