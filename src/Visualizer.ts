@@ -77,7 +77,7 @@ export class Visualizer {
     private target(mouseOffset: {offsetX: number; offsetY: number}): Player | null {
         const rs = this.cfg.playerRadius**2;  // radius squared to compare against distance squared
         const pairs: {p: Player; ds: number}[] = this.players.map(p => {
-            const ds = (mouseOffset.offsetX - p.x)**2 + (mouseOffset.offsetY - p.y);
+            const ds = (mouseOffset.offsetX - p.x)**2 + (mouseOffset.offsetY - p.y)**2;
             return {p, ds};
         }).filter(({p, ds}) => ds <= rs);
         if (pairs.length === 0) {
