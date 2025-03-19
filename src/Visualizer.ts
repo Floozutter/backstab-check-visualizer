@@ -11,12 +11,14 @@ export class Visualizer {
 
     static readonly defaultConfig: VisualizerConfig = {
         playerRadius: 15,
+        targetRadius: 18,
         pointerLength: 30,
         pointerWidth: 5,
         pointerCap: "round",
         styleAttacker: "red",
         styleDefender: "green",
         styleOther: "gray",
+        styleTarget: "dimgray",
     }
 
     constructor(canvas: HTMLCanvasElement, cfg: Partial<VisualizerConfig> = {}) {
@@ -107,8 +109,8 @@ export class Visualizer {
             // draw circle
             if (p === target) {
                 this.ctx.beginPath();
-                this.ctx.arc(p.x, p.y, this.cfg.playerRadius + 5, 0, 2*Math.PI);
-                this.ctx.fillStyle = "gray";
+                this.ctx.arc(p.x, p.y, this.cfg.targetRadius, 0, 2*Math.PI);
+                this.ctx.fillStyle = this.cfg.styleTarget;
                 this.ctx.fill();
             }
             this.ctx.beginPath();
@@ -139,12 +141,14 @@ export class Visualizer {
 
 export type VisualizerConfig = {
     playerRadius: number;
+    targetRadius: number;
     pointerLength: number;
     pointerWidth: number;
     pointerCap: "butt" | "round" | "square";
     styleAttacker: string;
     styleDefender: string;
     styleOther: string;
+    styleTarget: string;
 }
 
 type Player = {
