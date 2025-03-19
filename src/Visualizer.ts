@@ -104,19 +104,16 @@ export class Visualizer {
         // draw state onto canvas
         const target = mouseOffset !== null ? this.target(mouseOffset) : null;
         for (const p of this.players) {
-            if (p === this.attacker) {
-                this.ctx.fillStyle = this.cfg.styleAttacker;
-                this.ctx.strokeStyle = this.cfg.styleAttacker;
-            } else if (p === this.defender) {
-                this.ctx.fillStyle = this.cfg.styleDefender;
-                this.ctx.strokeStyle = this.cfg.styleDefender;
-            } else {
-                this.ctx.fillStyle = this.cfg.styleOther;
-                this.ctx.strokeStyle = this.cfg.styleOther;
-            }
             // draw circle
+            if (p === target) {
+                this.ctx.beginPath();
+                this.ctx.arc(p.x, p.y, this.cfg.playerRadius + 5, 0, 2*Math.PI);
+                this.ctx.fillStyle = "gray";
+                this.ctx.fill();
+            }
             this.ctx.beginPath();
             this.ctx.arc(p.x, p.y, this.cfg.playerRadius, 0, 2*Math.PI);
+            this.ctx.fillStyle = this.style(p);
             this.ctx.fill();
             // draw line from center towards heading
             this.ctx.lineWidth = this.cfg.pointerWidth;
@@ -124,7 +121,18 @@ export class Visualizer {
             this.ctx.beginPath();
             this.ctx.moveTo(p.x, p.y);
             this.ctx.lineTo(p.x + this.cfg.pointerLength*Math.cos(p.t), p.y + this.cfg.pointerLength*Math.sin(p.t));
+            this.ctx.strokeStyle = this.style(p);
             this.ctx.stroke();
+        }
+    }
+
+    private style(p: Player): string {
+        if (p === this.attacker) {
+            return this.cfg.styleAttacker;
+        } else if (p === this.defender) {
+            return this.cfg.styleDefender;
+        } else {
+            return this.cfg.styleOther;
         }
     }
 }
