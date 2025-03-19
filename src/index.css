@@ -1,5 +1,5 @@
 body {
-    background-color: #222222;
+    background-color: #111111;
 }
 
 #bscv-wrapper {
@@ -12,5 +12,5 @@ body {
 #bscv-canvas {
     display: block;
     margin: 50px 50px 50px 50px;
-    background-color: #ffffff;
+    background-color: #222222;
 }
